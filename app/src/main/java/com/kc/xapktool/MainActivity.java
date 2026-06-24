@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
 							apk.setCanceledOnTouchOutside(false);
 							apk.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 							apk.show();
+							fixDialogTextColors(apk);
 							apkFile = Arrays.asList(files).get((int) 0).toString();
 							
 							
