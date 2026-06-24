@@ -123,7 +123,7 @@ public class ExportActivity extends AppCompatActivity {
 				getApplicationContext(),
 				0,
 				nnm,
-				Intent.FLAG_ACTIVITY_NEW_TASK);
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 				nn.setContentIntent(nnn).setAutoCancel(true);
 				nn.setOngoing(false);
 				int onx = 30;
