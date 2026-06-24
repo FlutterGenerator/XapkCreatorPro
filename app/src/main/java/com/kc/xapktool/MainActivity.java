@@ -345,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
 							obb.setCancelable(false);
 							obb.setCanceledOnTouchOutside(false);
 							obb.show();
+							fixDialogTextColors(obb);
 							apkFile = Arrays.asList(files).get((int) 0).toString();
 							
 							
@@ -502,6 +503,7 @@ public class MainActivity extends AppCompatActivity {
 								     copyingThread.start();
 								     
 								SketchwareUtil.showMessage(getApplicationContext(), "Icon Selected");
+								
 							} 
 						});
 						XapkIcon.show();
@@ -565,6 +567,7 @@ public class MainActivity extends AppCompatActivity {
 					zip.setCancelable(false);
 					zip.setCanceledOnTouchOutside(false);
 					zip.show();
+					fixDialogTextColors(zip);
 					err = "Resources not found!";
 					if (FileUtil.isExistFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/".concat(edittext4.getText().toString().concat(".apk")))) {
 						if (FileUtil.isExistFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/".concat("icon".concat(".png")))) {
@@ -632,6 +635,7 @@ public class MainActivity extends AppCompatActivity {
 																@Override
 																public void run() {
 																	zip.setMessage("Securing xapk...");
+																	fixDialogTextColors(zip);
 																	zip.dismiss();
 																	d.setTitle("😎CONGRATULATIONS😎");
 																	d.setMessage("Your xapk exported successfully!");
@@ -643,8 +647,10 @@ public class MainActivity extends AppCompatActivity {
 																			finish();
 																		}
 																	});
-																	d.create().show();
-																	d.setCancelable(false);
+																	AlertDialog dialog = d.create();
+																	dialog.setCancelable(false);
+																	dialog.show();
+																	FontUtil.applyFont(MainActivity.this, dialog.getWindow().getDecorView());
 																}
 															});
 														}
