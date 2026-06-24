@@ -3,14 +3,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
     namespace "com.kc.xapktool"
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.kc.xapktool"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 2
         versionName "2.0"
     }
