@@ -81,9 +81,21 @@ public class HomeActivity extends AppCompatActivity {
 		FontUtil.applyFont(this, getWindow().getDecorView());
 		initialize(_savedInstanceState);
 		
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-		|| ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
+		// Android 11+ (API 30+) требует MANAGE_EXTERNAL_STORAGE для полного доступа к файлам
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+			if (!android.os.Environment.isExternalStorageManager()) {
+				android.content.Intent mgIntent = new android.content.Intent(
+					android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+					android.net.Uri.parse("package:" + getPackageName()));
+				startActivityForResult(mgIntent, 1000);
+			} else {
+				initializeLogic();
+			}
+		} else if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+				|| ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+			ActivityCompat.requestPermissions(this, new String[] {
+				Manifest.permission.READ_EXTERNAL_STORAGE,
+				Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
 		} else {
 			initializeLogic();
 		}
@@ -94,6 +106,20 @@ public class HomeActivity extends AppCompatActivity {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == 1000) {
 			initializeLogic();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 1000) {
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R
+					&& android.os.Environment.isExternalStorageManager()) {
+				initializeLogic();
+			} else {
+				SketchwareUtil.showMessage(getApplicationContext(),
+					"Storage permission required! Please grant All Files Access.");
+			}
 		}
 	}
 	
@@ -259,4 +285,4 @@ public class HomeActivity extends AppCompatActivity {
 	public int getDisplayHeightPixels() {
 		return getResources().getDisplayMetrics().heightPixels;
 	}
-}
+}
