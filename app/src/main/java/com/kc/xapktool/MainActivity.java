@@ -160,9 +160,21 @@ public class MainActivity extends AppCompatActivity {
 		FontUtil.applyFont(this, getWindow().getDecorView());
 		initialize(_savedInstanceState);
 		
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-		|| ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
+		// Android 11+ (API 30+) требует MANAGE_EXTERNAL_STORAGE для полного доступа к файлам
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+			if (!android.os.Environment.isExternalStorageManager()) {
+				android.content.Intent intent = new android.content.Intent(
+					android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+					android.net.Uri.parse("package:" + getPackageName()));
+				startActivityForResult(intent, 1000);
+			} else {
+				initializeLogic();
+			}
+		} else if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+				|| ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+			ActivityCompat.requestPermissions(this, new String[] {
+				Manifest.permission.READ_EXTERNAL_STORAGE,
+				Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
 		} else {
 			initializeLogic();
 		}
@@ -173,6 +185,21 @@ public class MainActivity extends AppCompatActivity {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == 1000) {
 			initializeLogic();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		// Возврат из настроек MANAGE_EXTERNAL_STORAGE (Android 11+)
+		if (requestCode == 1000) {
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R
+					&& android.os.Environment.isExternalStorageManager()) {
+				initializeLogic();
+			} else {
+				SketchwareUtil.showMessage(getApplicationContext(),
+					"Storage permission required! Please grant All Files Access.");
+			}
 		}
 	}
 	
@@ -773,45 +800,32 @@ public class MainActivity extends AppCompatActivity {
 			buttonn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View _view) {
-					Package_name = textt2.getText().toString();
+						Package_name = textt2.getText().toString();
+					// FIX: один вызов, реальное имя через getApplicationLabel, реальный versionName
 					try {
-						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
-						vCode = pinfo.versionCode; }
-					catch (Exception e){
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
+						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo(
+							Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
+						String appLabel = (String) getPackageManager().getApplicationLabel(pinfo.applicationInfo);
+						String resolvedVersionName = (pinfo.versionName != null && !pinfo.versionName.isEmpty())
+							? pinfo.versionName : "1.0";
+						long resolvedVersionCode = pinfo.versionCode;
+						int resolvedMinSdk = pinfo.applicationInfo.minSdkVersion;
+						int resolvedTargetSdk = pinfo.applicationInfo.targetSdkVersion;
+						edittext3.setText(appLabel);
+						edittext4.setText(Package_name);
+						edittext5.setText(String.valueOf(resolvedMinSdk));
+						edittext6.setText(String.valueOf(resolvedTargetSdk));
+						edittext7.setText(resolvedVersionName);
+						edittext8.setText(String.valueOf(resolvedVersionCode));
+						appp.dismiss();
+						SketchwareUtil.showMessage(getApplicationContext(), "Apk Info Applied Successfully!");
+						data.edit().remove("hhh").commit();
+						data.edit().remove("iii").commit();
+						a.removeExtra("hhh");
+						a.removeExtra("iii");
+					} catch (android.content.pm.PackageManager.NameNotFoundException e) {
+						SketchwareUtil.showMessage(getApplicationContext(), "Package not found: " + Package_name);
 					}
-					try {
-						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
-						vName = pinfo.versionName; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					try {
-							android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name,
-							android.content.pm.PackageManager.GET_ACTIVITIES);
-							tarSDK = pinfo.applicationInfo.targetSdkVersion; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					try {
-							android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name,
-							android.content.pm.PackageManager.GET_ACTIVITIES);
-							minSDK = pinfo.applicationInfo.minSdkVersion; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					edittext3.setText(textt.getText().toString());
-					edittext4.setText(textt2.getText().toString());
-					edittext5.setText(String.valueOf((long)(minSDK)));
-					edittext6.setText(String.valueOf((long)(tarSDK)));
-					edittext7.setText(vName);
-					edittext8.setText(String.valueOf((long)(vCode)));
-					appp.dismiss();
-					SketchwareUtil.showMessage(getApplicationContext(), "Apk Info Applied Successfully!");
-					data.edit().remove("hhh").commit();
-					data.edit().remove("iii").commit();
-					a.removeExtra("hhh");
-					a.removeExtra("iii");
 				}
 			});
 		}
