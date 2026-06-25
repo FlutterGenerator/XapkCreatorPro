@@ -527,54 +527,13 @@ public class MainActivity extends AppCompatActivity {
 									
 							}
 					}
-					// Используем JSON для точной замены значений — без риска задеть случайные подстроки
-					try {
-						org.json.JSONObject mf = new org.json.JSONObject(FileUtil.readFile(path));
-						
-						String oldPkg  = mf.optString("package_name", "");
-						String oldName = mf.optString("name", "");
-						String oldVer  = mf.optString("version_name", "");
-						String oldCode = mf.optString("version_code", "");
-						String oldMin  = mf.optString("min_sdk_version", "");
-						String oldTar  = mf.optString("target_sdk_version", "");
-						
-						String newPkg  = edittext4.getText().toString();
-						String newName = edittext3.getText().toString();
-						String newVer  = edittext7.getText().toString();
-						String newCode = edittext8.getText().toString();
-						String newMin  = edittext5.getText().toString();
-						String newTar  = edittext6.getText().toString();
-						
-						// Читаем файл как текст и делаем точечные замены по реальным значениям из JSON
-						String content = FileUtil.readFile(path);
-						
-						// Имя — заменяем везде (в name и во всех locales_name)
-						content = content.replace("\"" + oldName + "\"", "\"" + newName + "\"");
-						// package_name
-						content = content.replace("\"" + oldPkg + "\"", "\"" + newPkg + "\"");
-						// version_name
-						content = content.replace("\"" + oldVer + "\"", "\"" + newVer + "\"");
-						// version_code
-						content = content.replace("\"" + oldCode + "\"", "\"" + newCode + "\"");
-						// min_sdk_version
-						content = content.replace("\"" + oldMin + "\"", "\"" + newMin + "\"");
-						// target_sdk_version
-						content = content.replace("\"" + oldTar + "\"", "\"" + newTar + "\"");
-						// total_size (version_code как число)
-						content = content.replace(": " + oldCode, ": " + newCode);
-						
-						// expansions — заменяем путь к OBB
-						String oldObbPath = "Android/obb/" + oldPkg + "/main." + oldCode + "." + oldPkg + ".obb";
-						String newObbPath = "Android/obb/" + newPkg + "/main." + newCode + "." + newPkg + ".obb";
-						content = content.replace(oldObbPath, newObbPath);
-						
-						// split_apks — заменяем имя apk файла
-						content = content.replace("\"" + oldPkg + ".apk\"", "\"" + newPkg + ".apk\"");
-						
-						FileUtil.writeFile(path, content);
-					} catch (Exception e) {
-						SketchwareUtil.showMessage(getApplicationContext(), "manifest.json error: " + e.getMessage());
-					}
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("Shadow Fight 2", edittext3.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("com.nekki.shadowfight", edittext4.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("16", edittext5.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("28", edittext6.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("2.0.6", edittext7.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("2000017", edittext8.getText().toString()));
+					FileUtil.writeFile(path, FileUtil.readFile(path).replace("755935077", edittext8.getText().toString()));
 					FileUtil.listDir("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/", files);
 					zipper = 0;
 					zip = new ProgressDialog(MainActivity.this);
