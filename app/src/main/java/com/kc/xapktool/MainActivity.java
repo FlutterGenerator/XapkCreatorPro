@@ -250,74 +250,66 @@ public class MainActivity extends AppCompatActivity {
 							fixDialogTextColors(apk);
 							apkFile = Arrays.asList(files).get((int) 0).toString();
 							
-							
-							
-							        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-							        Thread copyingThread;
-							        
-							        
-							        final Handler mainHandler = new Handler(Looper.getMainLooper());
-							        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-							        progressDialog.setTitle("Copying Files...");
-							        progressDialog.setMessage("Copying apk file...");
-							        progressDialog.setIndeterminate(false);
-							        progressDialog.setCancelable(false);
-							        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-							        progressDialog.show();
-							        fixDialogTextColors(progressDialog);
-							
-							        copyingThread = new Thread(new Runnable() {
-								            @Override
-								            public void run() {        
-									
-									
-									
-									                java.io.File sourceFile = new java.io.File(apkFile);
-									                java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/".concat(edittext4.getText().toString().concat(".apk")));
-									                java.io.FileInputStream fileInputStream;
-									                java.io.FileOutputStream fileOutputStream;
-									                long length = sourceFile.length();
-									                int bytesRead;
-									                int totalBytesRead = 0;
-									                byte[] buffer = new byte[4 * 1024]; // 4KB buffer
-									                try {
-										                    fileInputStream = new java.io.FileInputStream(sourceFile);
-										                    fileOutputStream = new java.io.FileOutputStream(destFile);
-										
-										                    while (!Thread.currentThread().isInterrupted()
-										                            && (bytesRead = fileInputStream.read(buffer)) != -1) {
-											                   
-											                        fileOutputStream.write(buffer, 0, bytesRead);
-											
-											                 
-											                        totalBytesRead += bytesRead;
-											                        progressDialog.setMax((int)sourceFile.length());
-											                        final int fin = (int)(totalBytesRead);
-											                        
-											
-											                      
-											                        mainHandler.post(new Runnable() {
-												                            @Override
-												                            public void run() {
-													                                progressDialog.setProgress(fin);
-													                                
-													                            }
-												
-												                        });
-											                       if (fin == progressDialog.getMax()) {
-												                       progressDialog.dismiss();
-												                          }
-											                    }
-										
-										                } catch (Exception e) {
-										                    System.out.println("foo");
-										                }
-									            }
-								
-								        });
-							     copyingThread.start();
-							     
+							final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+							Thread copyingThread;
+							final Handler mainHandler = new Handler(Looper.getMainLooper());
+							progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+							progressDialog.setTitle("Copying Files...");
+							progressDialog.setMessage("Copying apk file...");
+							progressDialog.setIndeterminate(false);
+							progressDialog.setCancelable(false);
+							progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+							progressDialog.show();
+							fixDialogTextColors(progressDialog);
 							apk.dismiss();
+							
+							copyingThread = new Thread(new Runnable() {
+								@Override
+								public void run() {
+									java.io.File sourceFile = new java.io.File(apkFile);
+									java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/".concat(edittext4.getText().toString().concat(".apk")));
+									destFile.getParentFile().mkdirs();
+									int bytesRead;
+									int totalBytesRead = 0;
+									byte[] buffer = new byte[4 * 1024];
+									try {
+										java.io.FileInputStream fileInputStream = new java.io.FileInputStream(sourceFile);
+										java.io.FileOutputStream fileOutputStream = new java.io.FileOutputStream(destFile);
+										while (!Thread.currentThread().isInterrupted()
+												&& (bytesRead = fileInputStream.read(buffer)) != -1) {
+											fileOutputStream.write(buffer, 0, bytesRead);
+											totalBytesRead += bytesRead;
+											progressDialog.setMax((int)sourceFile.length());
+											final int fin = totalBytesRead;
+											mainHandler.post(new Runnable() {
+												@Override
+												public void run() {
+													progressDialog.setProgress(fin);
+												}
+											});
+										}
+										fileOutputStream.flush();
+										fileOutputStream.close();
+										fileInputStream.close();
+										mainHandler.post(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+												SketchwareUtil.showMessage(getApplicationContext(), "APK copied successfully!");
+											}
+										});
+									} catch (Exception e) {
+										mainHandler.post(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+												SketchwareUtil.showMessage(getApplicationContext(), "Error copying APK: " + e.getMessage());
+											}
+										});
+									}
+								}
+							});
+							copyingThread.start();
 						} 
 					});
 					apkPick.show();
@@ -349,74 +341,67 @@ public class MainActivity extends AppCompatActivity {
 							fixDialogTextColors(obb);
 							apkFile = Arrays.asList(files).get((int) 0).toString();
 							
-							
-							
-							        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-							        Thread copyingThread;
-							        
-							        
-							        final Handler mainHandler = new Handler(Looper.getMainLooper());
-							        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-							        progressDialog.setTitle("Copying Files...");
-							        progressDialog.setMessage("Copying apk file...");
-							        progressDialog.setIndeterminate(false);
-							        progressDialog.setCancelable(false);
-							        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-							        progressDialog.show();
-							        fixDialogTextColors(progressDialog);
-							
-							        copyingThread = new Thread(new Runnable() {
-								            @Override
-								            public void run() {        
-									
-									
-									
-									                java.io.File sourceFile = new java.io.File(apkFile);
-									                java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/main.".concat(edittext8.getText().toString().concat(".".concat(edittext4.getText().toString())).concat(".obb")));
-									                java.io.FileInputStream fileInputStream;
-									                java.io.FileOutputStream fileOutputStream;
-									                long length = sourceFile.length();
-									                int bytesRead;
-									                int totalBytesRead = 0;
-									                byte[] buffer = new byte[4 * 1024]; // 4KB buffer
-									                try {
-										                    fileInputStream = new java.io.FileInputStream(sourceFile);
-										                    fileOutputStream = new java.io.FileOutputStream(destFile);
-										
-										                    while (!Thread.currentThread().isInterrupted()
-										                            && (bytesRead = fileInputStream.read(buffer)) != -1) {
-											                   
-											                        fileOutputStream.write(buffer, 0, bytesRead);
-											
-											                 
-											                        totalBytesRead += bytesRead;
-											                        progressDialog.setMax((int)sourceFile.length());
-											                        final int fin = (int)(totalBytesRead);
-											                        
-											
-											                      
-											                        mainHandler.post(new Runnable() {
-												                            @Override
-												                            public void run() {
-													                                progressDialog.setProgress(fin);
-													                                
-													                            }
-												
-												                        });
-											                       if (fin == progressDialog.getMax()) {
-												                       progressDialog.dismiss();
-												                          }
-											                    }
-										
-										                } catch (Exception e) {
-										                    System.out.println("foo");
-										                }
-									            }
-								
-								        });
-							     copyingThread.start();
-							     
+							final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+							Thread copyingThread;
+							final Handler mainHandler = new Handler(Looper.getMainLooper());
+							progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+							progressDialog.setTitle("Copying Files...");
+							progressDialog.setMessage("Copying obb file...");
+							progressDialog.setIndeterminate(false);
+							progressDialog.setCancelable(false);
+							progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+							progressDialog.show();
+							fixDialogTextColors(progressDialog);
 							obb.dismiss();
+							
+							copyingThread = new Thread(new Runnable() {
+								@Override
+								public void run() {
+									java.io.File sourceFile = new java.io.File(apkFile);
+									// FIX 1: правильный путь OBB — main.<versionCode>.<packageName>.obb
+									java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/main.".concat(edittext8.getText().toString().concat(".".concat(edittext4.getText().toString())).concat(".obb")));
+									destFile.getParentFile().mkdirs();
+									int bytesRead;
+									int totalBytesRead = 0;
+									byte[] buffer = new byte[4 * 1024];
+									try {
+										java.io.FileInputStream fileInputStream = new java.io.FileInputStream(sourceFile);
+										java.io.FileOutputStream fileOutputStream = new java.io.FileOutputStream(destFile);
+										while (!Thread.currentThread().isInterrupted()
+												&& (bytesRead = fileInputStream.read(buffer)) != -1) {
+											fileOutputStream.write(buffer, 0, bytesRead);
+											totalBytesRead += bytesRead;
+											progressDialog.setMax((int)sourceFile.length());
+											final int fin = totalBytesRead;
+											mainHandler.post(new Runnable() {
+												@Override
+												public void run() {
+													progressDialog.setProgress(fin);
+												}
+											});
+										}
+										fileOutputStream.flush();
+										fileOutputStream.close();
+										fileInputStream.close();
+										mainHandler.post(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+												SketchwareUtil.showMessage(getApplicationContext(), "OBB copied successfully!");
+											}
+										});
+									} catch (Exception e) {
+										mainHandler.post(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+												SketchwareUtil.showMessage(getApplicationContext(), "Error copying OBB: " + e.getMessage());
+											}
+										});
+									}
+								}
+							});
+							copyingThread.start();
 						} 
 					});
 					obbPick.show();
@@ -436,75 +421,66 @@ public class MainActivity extends AppCompatActivity {
 							@Override public void onSelectedFilePaths(String[] files) {
 								apkFile = Arrays.asList(files).get((int) 0).toString();
 								
+								final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+								Thread copyingThread;
+								final Handler mainHandler = new Handler(Looper.getMainLooper());
+								progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+								progressDialog.setTitle("Copying Files...");
+								progressDialog.setMessage("Copying icon...");
+								progressDialog.setIndeterminate(false);
+								progressDialog.setCancelable(false);
+								progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+								progressDialog.show();
+								fixDialogTextColors(progressDialog);
 								
-								
-								        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-								        Thread copyingThread;
-								        
-								        
-								        final Handler mainHandler = new Handler(Looper.getMainLooper());
-								        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-								        progressDialog.setTitle("Copying Files...");
-								        progressDialog.setMessage("Copying apk file...");
-								        progressDialog.setIndeterminate(false);
-								        progressDialog.setCancelable(false);
-								        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-								        progressDialog.show();
-								        fixDialogTextColors(progressDialog);
-								
-								        copyingThread = new Thread(new Runnable() {
-									            @Override
-									            public void run() {        
-										
-										
-										
-										                java.io.File sourceFile = new java.io.File(apkFile);
-										                java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/".concat(edittext4.getText().toString().concat(".apk")));
-										                java.io.FileInputStream fileInputStream;
-										                java.io.FileOutputStream fileOutputStream;
-										                long length = sourceFile.length();
-										                int bytesRead;
-										                int totalBytesRead = 0;
-										                byte[] buffer = new byte[4 * 1024]; // 4KB buffer
-										                try {
-											                    fileInputStream = new java.io.FileInputStream(sourceFile);
-											                    fileOutputStream = new java.io.FileOutputStream(destFile);
-											
-											                    while (!Thread.currentThread().isInterrupted()
-											                            && (bytesRead = fileInputStream.read(buffer)) != -1) {
-												                   
-												                        fileOutputStream.write(buffer, 0, bytesRead);
-												
-												                 
-												                        totalBytesRead += bytesRead;
-												                        progressDialog.setMax((int)sourceFile.length());
-												                        final int fin = (int)(totalBytesRead);
-												                        
-												
-												                      
-												                        mainHandler.post(new Runnable() {
-													                            @Override
-													                            public void run() {
-														                                progressDialog.setProgress(fin);
-														                                
-														                            }
-													
-													                        });
-												                       if (fin == progressDialog.getMax()) {
-													                       progressDialog.dismiss();
-													                          }
-												                    }
-											
-											                } catch (Exception e) {
-											                    System.out.println("foo");
-											                }
-										            }
-									
-									        });
-								     copyingThread.start();
-								     
-								SketchwareUtil.showMessage(getApplicationContext(), "Icon Selected");
-								
+								copyingThread = new Thread(new Runnable() {
+									@Override
+									public void run() {
+										java.io.File sourceFile = new java.io.File(apkFile);
+										// FIX 2: иконка должна сохраняться как icon.png, а не <package>.apk
+										java.io.File destFile = new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/icon.png");
+										destFile.getParentFile().mkdirs();
+										int bytesRead;
+										int totalBytesRead = 0;
+										byte[] buffer = new byte[4 * 1024];
+										try {
+											java.io.FileInputStream fileInputStream = new java.io.FileInputStream(sourceFile);
+											java.io.FileOutputStream fileOutputStream = new java.io.FileOutputStream(destFile);
+											while (!Thread.currentThread().isInterrupted()
+													&& (bytesRead = fileInputStream.read(buffer)) != -1) {
+												fileOutputStream.write(buffer, 0, bytesRead);
+												totalBytesRead += bytesRead;
+												progressDialog.setMax((int)sourceFile.length());
+												final int fin = totalBytesRead;
+												mainHandler.post(new Runnable() {
+													@Override
+													public void run() {
+														progressDialog.setProgress(fin);
+													}
+												});
+											}
+											fileOutputStream.flush();
+											fileOutputStream.close();
+											fileInputStream.close();
+											mainHandler.post(new Runnable() {
+												@Override
+												public void run() {
+													progressDialog.dismiss();
+													SketchwareUtil.showMessage(getApplicationContext(), "Icon Selected");
+												}
+											});
+										} catch (Exception e) {
+											mainHandler.post(new Runnable() {
+												@Override
+												public void run() {
+													progressDialog.dismiss();
+													SketchwareUtil.showMessage(getApplicationContext(), "Error copying icon: " + e.getMessage());
+												}
+											});
+										}
+									}
+								});
+								copyingThread.start();
 							} 
 						});
 						XapkIcon.show();
@@ -577,91 +553,55 @@ public class MainActivity extends AppCompatActivity {
 									if (FileUtil.isExistFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Exported/".concat(edittext3.getText().toString().concat(".xapk")))) {
 										FileUtil.deleteFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Exported/".concat(edittext3.getText().toString().concat(".xapk")));
 									}
-									timer = new TimerTask() {
+									// Убеждаемся что папка Exported существует
+									new java.io.File("/storage/emulated/0/KC Tool Kit VIP/XAPK/Exported/").mkdirs();
+									
+									zip.setMessage("Linking Resources...");
+									FileUtil.listDir("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/", files);
+									
+									// FIX 3: убраны таймеры — результат показывается в onPostExecute
+									// после реального завершения ZIP, а не через 90 сек вслепую
+									new _BackgroundTaskClass(MainActivity.this) {
 										@Override
-										public void run() {
-											runOnUiThread(new Runnable() {
+										public void doInBackground() {
+											for (String vb: files) {
+												try {
+													try {
+														java.lang.Thread.sleep(50);
+													} catch (java.lang.InterruptedException exc) {}
+													net.lingala.zip4j.model.ZipParameters zipParameters = new net.lingala.zip4j.model.ZipParameters();
+													zipParameters.setCompressionLevel(net.lingala.zip4j.model.enums.CompressionLevel.ULTRA);
+													zipParameters.setCompressionMethod(net.lingala.zip4j.model.enums.CompressionMethod.STORE);
+													net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Exported/".concat(edittext3.getText().toString().concat(".xapk")));
+													if (FileUtil.isDirectory(vb)) {
+														zipFile.addFolder(new java.io.File(vb), zipParameters);
+													} else {
+														zipFile.addFile(new java.io.File(vb), zipParameters);
+													}
+												} catch (Exception e) {
+												}
+											}
+										}
+										
+										@Override
+										public void onPostExecute() {
+											zip.dismiss();
+											d.setTitle("😎CONGRATULATIONS😎");
+											d.setMessage("Your xapk exported successfully!");
+											d.setPositiveButton("ok", new DialogInterface.OnClickListener() {
 												@Override
-												public void run() {
-													zip.setMessage("Linking Resources...");
-													FileUtil.listDir("/storage/emulated/0/KC Tool Kit VIP/XAPK/Work/", files);
-													/*thanks to Star2Droid channel & some zip4j library & some help from kind people on stackoverflow to help me out */
-													
-													
-													new _BackgroundTaskClass(MainActivity.this) {
-																        @Override
-																        public void doInBackground() {
-																			files = files;
-																			for (String vb: files)  {
-																							try {
-																											try {
-																															java.lang.Thread.sleep(50);
-																											}  catch (java.lang.InterruptedException exc){} 
-																												net.lingala.zip4j.model.ZipParameters zipParameters = new net.lingala.zip4j.model.ZipParameters();
-																											zipParameters.setCompressionLevel(net.lingala.zip4j.model.enums.CompressionLevel.ULTRA); 
-																											zipParameters.setCompressionMethod(net.lingala.zip4j.model.enums.CompressionMethod.STORE);
-																											net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile("/storage/emulated/0/KC Tool Kit VIP/XAPK/Exported/".concat(edittext3.getText().toString().concat(".xapk")));
-																											if (FileUtil.isDirectory(vb)) {
-																													
-																		zipFile.addFolder(new java.io.File(vb), zipParameters);
-																									}
-																									else {
-																													
-																		zipFile.addFile(new java.io.File(vb), zipParameters);
-																									}
-																							} catch (Exception e) {
-																							}
-																			}
-																			            //put you background code
-																			            //same like doingBackground
-																			            //Background Thread
-																			
-																			
-																			
-																			        }
-																
-																        @Override
-																        public void onPostExecute() {
-																			  
-																			            //hear is result part same
-																			            //same like post execute
-																			            //UI Thread(update your UI widget)
-																			        }
-																    }.execute();
-													zip.setMessage("Building xapk...");
-													timer = new TimerTask() {
-														@Override
-														public void run() {
-															runOnUiThread(new Runnable() {
-																@Override
-																public void run() {
-																	zip.setMessage("Securing xapk...");
-																	fixDialogTextColors(zip);
-																	zip.dismiss();
-																	d.setTitle("😎CONGRATULATIONS😎");
-																	d.setMessage("Your xapk exported successfully!");
-																	d.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-																		@Override
-																		public void onClick(DialogInterface _dialog, int _which) {
-																			a.setClass(getApplicationContext(), HomeActivity.class);
-																			startActivity(a);
-																			finish();
-																		}
-																	});
-																	AlertDialog dialog = d.create();
-																	dialog.setCancelable(false);
-																	dialog.show();
-																	FontUtil.applyFont(MainActivity.this, dialog.getWindow().getDecorView());
-																}
-															});
-														}
-													};
-													_timer.schedule(timer, (int)(90000));
+												public void onClick(DialogInterface _dialog, int _which) {
+													a.setClass(getApplicationContext(), HomeActivity.class);
+													startActivity(a);
+													finish();
 												}
 											});
+											AlertDialog dialog = d.create();
+											dialog.setCancelable(false);
+											dialog.show();
+											FontUtil.applyFont(MainActivity.this, dialog.getWindow().getDecorView());
 										}
-									};
-									_timer.schedule(timer, (int)(5000));
+									}.execute();
 								}
 								else {
 									zip.dismiss();
@@ -774,44 +714,37 @@ public class MainActivity extends AppCompatActivity {
 				@Override
 				public void onClick(View _view) {
 					Package_name = textt2.getText().toString();
+					// FIX 4: один вызов getPackageInfo вместо четырёх
+					// FIX 5: реальное имя через getApplicationLabel, реальный versionName
 					try {
-						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
-						vCode = pinfo.versionCode; }
-					catch (Exception e){
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
+						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo(
+							Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
+						
+						// Реальное название приложения
+						String appLabel = (String) getPackageManager().getApplicationLabel(pinfo.applicationInfo);
+						// Реальный versionName
+						String resolvedVersionName = (pinfo.versionName != null && !pinfo.versionName.isEmpty())
+							? pinfo.versionName : "1.0";
+						long resolvedVersionCode = pinfo.versionCode;
+						int resolvedMinSdk = pinfo.applicationInfo.minSdkVersion;
+						int resolvedTargetSdk = pinfo.applicationInfo.targetSdkVersion;
+						
+						edittext3.setText(appLabel);
+						edittext4.setText(Package_name);
+						edittext5.setText(String.valueOf(resolvedMinSdk));
+						edittext6.setText(String.valueOf(resolvedTargetSdk));
+						edittext7.setText(resolvedVersionName);
+						edittext8.setText(String.valueOf(resolvedVersionCode));
+						
+						appp.dismiss();
+						SketchwareUtil.showMessage(getApplicationContext(), "Apk Info Applied Successfully!");
+						data.edit().remove("hhh").commit();
+						data.edit().remove("iii").commit();
+						a.removeExtra("hhh");
+						a.removeExtra("iii");
+					} catch (android.content.pm.PackageManager.NameNotFoundException e) {
+						SketchwareUtil.showMessage(getApplicationContext(), "Package not found: " + Package_name);
 					}
-					try {
-						android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name, android.content.pm.PackageManager.GET_ACTIVITIES);
-						vName = pinfo.versionName; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					try {
-							android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name,
-							android.content.pm.PackageManager.GET_ACTIVITIES);
-							tarSDK = pinfo.applicationInfo.targetSdkVersion; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					try {
-							android.content.pm.PackageInfo pinfo = getPackageManager().getPackageInfo( Package_name,
-							android.content.pm.PackageManager.GET_ACTIVITIES);
-							minSDK = pinfo.applicationInfo.minSdkVersion; }
-					catch (Exception e){ 
-						    SketchwareUtil.showMessage(getApplicationContext(), e.toString());
-						 }
-					edittext3.setText(textt.getText().toString());
-					edittext4.setText(textt2.getText().toString());
-					edittext5.setText(String.valueOf((long)(minSDK)));
-					edittext6.setText(String.valueOf((long)(tarSDK)));
-					edittext7.setText(vName);
-					edittext8.setText(String.valueOf((long)(vCode)));
-					appp.dismiss();
-					SketchwareUtil.showMessage(getApplicationContext(), "Apk Info Applied Successfully!");
-					data.edit().remove("hhh").commit();
-					data.edit().remove("iii").commit();
-					a.removeExtra("hhh");
-					a.removeExtra("iii");
 				}
 			});
 		}
@@ -870,8 +803,6 @@ public class MainActivity extends AppCompatActivity {
 		overrideFonts(this,getWindow().getDecorView()); 
 	} 
 
-	// Делает текст заголовка и сообщения в ProgressDialog тёмным и читаемым на белом фоне,
-	// и применяет к нему кастомный шрифт. Вызывается сразу после progressDialog.show().
 	private void fixDialogTextColors(ProgressDialog dialog) {
 		try {
 			int darkText = 0xFF101D24;
